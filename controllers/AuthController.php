@@ -28,18 +28,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
     $email = $_POST['email'];
     $password = $_POST['password'];
+    $login_type = $_POST['login_type'] ?? 'user';
 
     $user = $userModel->login($email, $password);
 
     if ($user) {
+        if ($login_type === 'admin' && $user['role'] !== 'admin') {
+            header("Location: ../views/auth/admin-login.php?error=unauthorized");
+            exit;
+        }
+
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['name'] = $user['name'];
         $_SESSION['role'] = $user['role'];
-        header("Location: ../views/task-list.php");
+
+        if ($user['role'] === 'admin') {
+            header("Location: ../views/admin-dashboard.php");
+        } else {
+            header("Location: ../views/task-list.php");
+        }
         exit;
     } else {
-        header("Location: ../views/auth/login.php?error=1");
+        $redirect = $login_type === 'admin' ? 'admin-login.php' : 'login.php';
+        header("Location: ../views/auth/$redirect?error=1");
         exit;
     }
 }
+
 ?>
