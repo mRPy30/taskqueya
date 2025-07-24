@@ -1,8 +1,8 @@
 <?php
 require_once '../../config/database.php';
 
-$API_KEY    = 'HsHnVHDZrE5BJS733an-UM39MZfVAxsR';
-$API_SECRET = 'lhHN6-ecoXb2n8AxI3od-K-olutTrKwE';
+$API_KEY    = '';
+$API_SECRET = '';
 $COMPARE_URL= 'https://api-us.faceplusplus.com/facepp/v3/compare';
 
 session_start();
