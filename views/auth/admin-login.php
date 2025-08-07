@@ -188,7 +188,6 @@
             <?php endif; ?>
 
             <form method="POST" action="../../controllers/AuthController.php" class="login-form">
-
                 <input type="hidden" name="login_type" value="admin">
 
                 <div class="input-group">
@@ -200,16 +199,6 @@
                     <input type="password" name="password" id="admin-password" required>
                     <label for="admin-password">Password</label>
                 </div>
-                <canvas id="waveform" width="300" height="40" style="background:#eee; border-radius:8px; margin: 10px auto; display:block;"></canvas>
-
-                <button type="button" id="voiceLoginBtn" class="btn-login" style="margin-top: 10px; background-color: green;">
-    Login with Voice
-</button>
-<p id="voiceResult" style="text-align:center; color: green; margin-top: 10px;"></p>
-<button type="button" id="stopListeningBtn" class="btn-login" style="margin-top: 10px; background-color: red;">
-    Stop Listening
-</button>
-
 
                 <button type="submit" name="login" class="btn-login">Login as Admin</button>
             </form>
@@ -219,129 +208,6 @@
             </p>
         </div>
     </main>
-    <script>
-let recognition;
-
-// ✅ Speak using browser
-function speak(message) {
-    const synth = window.speechSynthesis;
-    const utter = new SpeechSynthesisUtterance(message);
-    utter.lang = 'en-US';
-    synth.speak(utter);
-}
-
-// ✅ Start waveform animation
-function startVisualizerFromMic() {
-    navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
-        const canvas = document.getElementById('waveform');
-        const canvasCtx = canvas.getContext('2d');
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        const source = audioCtx.createMediaStreamSource(stream);
-        const analyser = audioCtx.createAnalyser();
-        analyser.fftSize = 256;
-        const bufferLength = analyser.frequencyBinCount;
-        const dataArray = new Uint8Array(bufferLength);
-
-        source.connect(analyser);
-
-        function draw() {
-            requestAnimationFrame(draw);
-            analyser.getByteFrequencyData(dataArray);
-            canvasCtx.fillStyle = '#eee';
-            canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
-            let x = 0;
-            const barWidth = (canvas.width / bufferLength) * 2.5;
-            for (let i = 0; i < bufferLength; i++) {
-                const barHeight = dataArray[i] / 2;
-                canvasCtx.fillStyle = `rgb(0, 150, ${barHeight + 100})`;
-                canvasCtx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
-                x += barWidth + 1;
-            }
-        }
-
-        draw();
-    });
-}
-
-// ✅ Voice login with backend phrase match
-function startVoiceLogin() {
-    if (!('webkitSpeechRecognition' in window)) {
-        alert("Speech recognition not supported in this browser.");
-        return;
-    }
-
-    recognition = new webkitSpeechRecognition();
-    recognition.continuous = false;
-    recognition.lang = 'en-US';
-    recognition.interimResults = false;
-
-    const output = document.getElementById("voiceResult");
-    output.innerText = "Listening...";
-    speak("Speak your login phrase.");
-    startVisualizerFromMic();
-
-    recognition.onresult = function(event) {
-        const spoken = event.results[0][0].transcript.toLowerCase().trim();
-        console.log("Spoken:", spoken);
-
-        fetch("verify-voice-login.php", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ spoken })
-        }).then(res => res.json()).then(data => {
-            if (data.success) {
-                output.innerText = "Access granted.";
-                speak("Access granted. Redirecting...");
-                setTimeout(() => {
-                    window.location.href = "../administrator/dashboard.php";
-                }, 1500);
-            } else {
-                output.innerText = "Phrase not recognized.";
-                speak("Phrase not recognized. Try again.");
-            }
-        });
-    };
-
-    recognition.onerror = function(event) {
-        console.error("Recognition error:", event);
-        speak("Error recognizing voice.");
-    };
-
-    recognition.onend = function() {
-        console.log("Recognition ended.");
-    };
-
-    recognition.start();
-}
-
-// ✅ Button click
-document.getElementById("voiceLoginBtn").addEventListener("click", startVoiceLogin);
-
-
-// ✅ Stop the recognition and update status
-function stopVoiceRecognition() {
-    if (recognition) {
-        recognition.stop();
-        document.getElementById("voiceResult").innerText = "Voice recognition stopped.";
-        speak("Voice recognition stopped.");
-    }
-}
-
-// ✅ Attach to button
-document.getElementById("stopListeningBtn").addEventListener("click", stopVoiceRecognition);
-
-
-function speak(message) {
-  const synth = window.speechSynthesis;
-  const utter = new SpeechSynthesisUtterance(message);
-  synth.speak(utter);
-}
-
-</script>
-
-
-
 </body>
-
 
 </html>

@@ -1,6 +1,7 @@
+@import "tailwindcss/base";
 :root {
   --bg-color: #e5e5e5;
-  --text-dark: #000;
+  --text-dark: #202020;
 }
 
 * {

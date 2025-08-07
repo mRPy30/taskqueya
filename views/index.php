@@ -73,11 +73,18 @@ foreach ($rows as $row) {
 
   <!--Title-->
   <link rel="short icon" href="../Logo-TQ.png" type="x-icon">
-  <title>TaskQueya</title>
+  <title>Welcome to TaskQueya</title>
 
   <!--Css Links-->
   <link rel="stylesheet" href="assets/css/style.css">
   <link rel="stylesheet" href="assets/css/font.css">
+
+  <!-- Bootstrap first -->
+  <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
+
+
+  <!--Tailwind Css-->
+  <link rel="stylesheet" href="../assets/css/output.css">
 
   <!--ICON LINKS-->
   <link rel="stylesheet" href="../font-awesome-6/css/all.css">

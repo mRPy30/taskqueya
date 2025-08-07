@@ -24,56 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
     }
 }
 
-// ✅ Handle Admin Voice Recognition Login
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['voice_login'])) {
-    $output = shell_exec("python " . __DIR__ . "/../views/auth/verify_voice.py");
-    $data = json_decode($output, true);
-
-    if ($data && $data['status'] === 'success') {
-        // Get admin by email from DB
-        $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ? AND role = 'admin'");
-        $stmt->execute([$data['email']]);
-        $admin = $stmt->fetch(PDO::FETCH_ASSOC);
-
-        if ($admin) {
-            $_SESSION['user_id'] = $admin['id'];
-            $_SESSION['name'] = $admin['name'];
-            $_SESSION['role'] = $admin['role'];
-
-            header("Location: ../views/administrator/dashboard.php");
-            exit;
-        } else {
-            header("Location: ../views/auth/admin-login.php?error=admin_not_found");
-            exit;
-        }
-    } else {
-        header("Location: ../views/auth/admin-login.php?error=voice_not_recognized");
-        exit;
-    }
-}
-
-// ✅ Handle Admin Face Login from Python
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['admin_id']) && !isset($_POST['login'])) {
-    $admin_id = $_POST['admin_id'];
-    $stmt = $pdo->prepare("SELECT * FROM users WHERE id = ? AND role = 'admin'");
-    $stmt->execute([$admin_id]);
-    $admin = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if ($admin) {
-        $_SESSION['user_id'] = $admin['id'];
-        $_SESSION['name'] = $admin['name'];
-        $_SESSION['role'] = $admin['role'];
-
-        echo "Face login successful.";
-    } else {
-        http_response_code(401);
-        echo "Face login failed.";
-    }
-
-    exit;
-}
-
-// Handle Email/Password Login
+// Handle Login
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
     $email = $_POST['email'];
     $password = $_POST['password'];
@@ -94,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
         if ($user['role'] === 'admin') {
             header("Location: ../views/administrator/dashboard.php");
         } else {
-            header("Location: ../views/task-list.php");
+            header("Location: ../views/user/task-list.php");
         }
         exit;
     } else {
@@ -103,4 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
         exit;
     }
 }
+
 ?>
+
+

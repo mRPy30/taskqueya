@@ -10,6 +10,7 @@
 </head>
 <style>
     :root {
+        --background-color: linear-gradient(135deg, #001E36, #004080);
         --primary-color: #007bff;
         --primary-dark: #0056b3;
         --text-color: #333;
@@ -30,7 +31,7 @@
     }
     body {
         font-family: 'Segoe UI', sans-serif;
-        background: linear-gradient(135deg, #001E36, #004080);
+        background: var(--background-color);
         display: flex;
         justify-content: center;
         align-items: center;
